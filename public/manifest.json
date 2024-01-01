@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Next PWA ",
-    "short_name": "Next PWA",
-    "description": "Next PWA test app",
+    "name": "NEXT PWAAPP",
+    "short_name": "NEXT PWA",
+    "description": "Cool App",
     "icons": [
         {
             "src": "/icon-192x192.png",

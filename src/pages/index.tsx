@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
+import StartPage from "./start";
+import Login from "./login";
 
 const index = () => {
   return (
-    <div className='justify-center'>PWA_Next</div>
-  )
-}
+    <>
+      <StartPage />
+    </>
+  );
+};
 
-export default index
+export default index;

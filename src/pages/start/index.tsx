@@ -5,13 +5,12 @@ import Skeleton from "@mui/material/Skeleton";
 const StartPage = () => {
   return (
     <>
-      <div className="items-center flex flex-col mx-auto">
-        <div className="mt-[195px]">
+      <div className="items-center flex flex-col">
+        <div className="justify-center mt-[150px]">
           <Skeleton
             sx={{
               borderRadius: "24px",
               backgroundColor: "#F1F1F1",
-              // marginTop: "195px",
             }}
             animation={false}
             variant="rectangular"
@@ -23,7 +22,7 @@ const StartPage = () => {
             <span className="text-[17px]">Tagline</span>
           </div>
         </div>
-        <div className="bg-[#F0F0F0] mt-[105px] h-[297px] w-full ]">
+        <div className="bg-[#F0F0F0] w-full fixed bottom-0 flex flex-col items-center ]">
           <div className="flex flex-col mt-[30px] ml-[42px] mr-[42px] text-justify">
             <span className="font-bold text-[24px]">Welcome!</span>
             <span className="mt-[10px] text-[10px] ">
@@ -33,13 +32,13 @@ const StartPage = () => {
               possimus unde.
             </span>
           </div>
-          <div className="flex justify-center items-center md:mx-[580px] mx-[120px] p-1 bg-white mt-[70px] width-[174px]">
+          <div className="flex justify-center items-center h-[45px] px-1 bg-white my-[35px] w-[176px]">
             <Link href="/login">
               <Button className="bg-primary" size="small" variant="contained">
                 LOG IN
               </Button>
             </Link>
-            <Button className="ml-[10px]" size="small" variant="outlined">
+            <Button className="!ml-[10px]" size="small" variant="outlined">
               REGISTER
             </Button>
           </div>

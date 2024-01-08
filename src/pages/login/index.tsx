@@ -20,7 +20,7 @@ const Login = () => {
   };
 
   const isValidPhoneNumber = () => {
-    return /^03\d{9}$/.test(ph);
+    return /^3\d{9}$/.test(ph);
   };
 
   const handleOtpChange = (event: any) => {
@@ -103,7 +103,7 @@ const Login = () => {
               <span className="font-bold text-[24px] mt-[10px] text-center">
                 Log In
               </span>
-              <label className="mt-[50px] text-[12px] text-left">
+              <label className="!mt-[50px] text-[12px] !text-left">
                 Enter the OTP sent to
                 <span className="font-bold"> Phone No</span>
               </label>
@@ -124,8 +124,8 @@ const Login = () => {
               <Button
                 onClick={onOTPVerify}
                 size="small"
-                variant="contained"
-                className="w-full bg-black hover:bg-black mt-[10px] text-white"
+                // variant="contained"
+                className="w-full !bg-black !hover:bg-black !mt-[10px] !text-white"
               >
                 Verify OTP
               </Button>
@@ -138,7 +138,7 @@ const Login = () => {
                 Log In
               </span>
               <TextField
-                className="mt-[50px]"
+                className="!mt-[150px]"
                 type="tel"
                 variant="standard"
                 label="Phone No"
@@ -161,7 +161,7 @@ const Login = () => {
                   ),
                 }}
               />
-              <span className="mt-[30px]">
+              <span className="!mt-[25px]">
                 <Button
                   onClick={onSignUp}
                   size="small"

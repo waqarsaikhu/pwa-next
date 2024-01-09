@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Button from "@mui/material/Button";
 import { TextField, Skeleton, InputAdornment } from "@mui/material";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { auth } from "../../firebase.config";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -13,6 +17,17 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/home");
+      }
+    });
+
+    // Cleanup function
+    return () => unsubscribe();
+  }, []);
 
   const handlePhoneNumberChange = (event: any) => {
     const value = event.target.value;
@@ -28,19 +43,17 @@ const Login = () => {
     setOtp(value.slice(0, 6));
   };
 
+  let recaptchaVerifier: any;
+
   function onCaptchVerify() {
-    if (!(window as any).recaptchaVerifier) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: (response: any) => {
-            onSignUp();
-          },
-          "expired-callback": () => {},
-        }
-      );
+    if (!recaptchaVerifier) {
+      recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+        callback: (response: any) => {
+          onSignUp();
+        },
+        "expired-callback": () => {},
+      });
     }
   }
 

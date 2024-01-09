@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import Skeleton from "@mui/material/Skeleton";
+import { useRouter } from "next/router";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase.config";
 const StartPage = () => {
+  const router = useRouter();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/home");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
   return (
     <>
       <div className="items-center flex flex-col">

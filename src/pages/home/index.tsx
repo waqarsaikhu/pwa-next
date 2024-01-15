@@ -1,16 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import Button from "@mui/material/Button";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
+import { auth } from "../../firebase.config";
 const Home = () => {
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const signOutAndNavigate = async () => {
+    try {
+      await auth.signOut();
+      router.push("/");
+    } catch (err) {
+      console.error("Error signing out:", err);
+    }
+  };
   return (
     <>
-      <div className="items-center flex flex-col h-[screen] md:w-md">
+      <div className="items-center flex flex-col h-screen md:w-md">
         <div className="flex justify-center mt-[28px] w-[100%] h-[40px] border-b-[1px]">
-          <span className="ml-[28px] w-[14px] h-[14px]">
+          <span
+            className="ml-[28px] w-[14px] h-[14px]"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             <MenuIcon />
           </span>
           <span className="ml-[79px] text-[18px] font-bold">TAILOR BOOK</span>
@@ -37,10 +55,14 @@ const Home = () => {
             No Data
           </span>
         </div>
-        <div className="flex items-center justify-center fixed bottom-[97px] right-[24px] w-[54px] h-[54px] rounded-full bg-slate-200">
-          <span className="">
-            <PersonAddAltOutlinedIcon />
-          </span>
+        <div className="flex items-center justify-center fixed bottom-[97px] right-[24px] w-[54px] h-[54px] rounded-full bg-slate-100">
+          <Link href="/new-client">
+            <Button>
+              <span className="text-black">
+                <PersonAddAltOutlinedIcon />
+              </span>
+            </Button>
+          </Link>
         </div>
         <div className="flex bottom-0 fixed items-center justify-center h-[78px] bg-[#F8F8F8] w-[100%] ">
           <div className="flex ml-[48px] items-center h-[44px] my-[17px] border-r-2  ">
@@ -53,6 +75,26 @@ const Home = () => {
             <span className="text-[16px] ">Customers</span>
           </div>
         </div>
+        {isMenuOpen && (
+          <div className="absolute top-0 left-0 w-full h-full bg-white bg-opacity-100 z-10">
+            <div className="flex justify-end p-4">
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="text-black font-bold"
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex flex-col items-center mt-20">
+              <button
+                onClick={signOutAndNavigate}
+                className="text-black font-bold"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

@@ -43,31 +43,37 @@ const Login = () => {
     setOtp(value.slice(0, 6));
   };
 
-  let recaptchaVerifier: any;
+  // let recaptchaVerifier: any;
 
   function onCaptchVerify() {
-    if (!recaptchaVerifier) {
-      recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-        size: "invisible",
-        callback: (response: any) => {
-          onSignUp();
-        },
-        "expired-callback": () => {},
-      });
+    if (!(window as any).recaptchaVerifier) {
+      (window as any).recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        "recaptcha-container",
+        {
+          size: "invisible",
+          callback: (response: any) => {
+            console.log("Response:", response);
+            onSignUp();
+          },
+          "expired-callback": () => {},
+        }
+      );
     }
   }
 
-  function onSignUp() {
+  const onSignUp = async () => {
     setLoading(true);
     onCaptchVerify();
     const appVerifier = (window as any).recaptchaVerifier;
-
+    console.log("C:", appVerifier);
     const formatPh = "+92" + ph;
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
+    await signInWithPhoneNumber(auth, formatPh, appVerifier)
       .then((confirmationResult) => {
         (window as any).confirmationResult = confirmationResult;
         setLoading(false);
         setShowOTP(true);
+        alert("OTP sent successfullly!");
         console.log("OTP Sent Successfully");
       })
       .catch((error) => {
@@ -75,7 +81,7 @@ const Login = () => {
         console.error("Error sending OTP:", error.message);
         setLoading(false);
       });
-  }
+  };
 
   function onOTPVerify() {
     setLoading(true);
@@ -155,6 +161,7 @@ const Login = () => {
                 type="tel"
                 variant="standard"
                 label="Phone No"
+                placeholder="3211234567"
                 value={ph}
                 onChange={handlePhoneNumberChange}
                 InputProps={{

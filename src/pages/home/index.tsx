@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -7,11 +7,25 @@ import SearchIcon from "@mui/icons-material/Search";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useAppDispatch } from "@/hooks";
+import { fetchUsers } from "@/redux/userSlice";
+import { collection, getDoc, doc } from "firebase/firestore";
 
-import { auth } from "../../firebase.config";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+
+import { auth, firestore, db } from "../../firebase.config";
+
+type ClientDetails = any;
+
 const Home = () => {
+  const user = useSelector((state: RootState) => state.user.users);
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
   const signOutAndNavigate = async () => {
     try {
@@ -23,7 +37,7 @@ const Home = () => {
   };
   return (
     <>
-      <div className="items-center flex flex-col h-screen md:w-md">
+      <div className="flex flex-col justify-center items-center bg-[#FFF] mb-[10px]">
         <div className="flex justify-center mt-[28px] w-[100%] h-[40px] border-b-[1px]">
           <span
             className="ml-[28px] w-[14px] h-[14px]"
@@ -50,12 +64,53 @@ const Home = () => {
             <FilterListIcon fontSize="small" />
           </span>
         </div>
-        <div className="flex mt-[160px]">
+
+        {user.map((item: any) => {
+          return item.clients.map((client: any) => {
+            return (
+              <div
+                className="flex flex-grow relative items-center w-[334px] bg-[#f8f8f8] mt-[10px] p-3 rounded-[19px] "
+                style={{
+                  overflowY: "auto",
+                }}
+              >
+                <div className="bg-gray-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-4">
+                  H
+                </div>
+                <div className="flex flex-col">
+                  <span
+                    className="font-bold text-[12px] cursor-pointer "
+                    onClick={() => {
+                      router.push({
+                        pathname: "/client-info",
+                        query: client,
+                      });
+                    }}
+                  >
+                    {client.clientName}
+                  </span>
+                  <span className="text-[#939393] text-[10px]">
+                    Set delivery date now
+                  </span>
+                </div>
+                <div className=" absolute right-[15px] text-center">
+                  <div className="w-[68px] flex justify-center items-center h-[18px] text-[9px] bg-[#939393] rounded-[7px] text-white  text-center">
+                    <button className="">Complete</button>
+                  </div>
+                  <span className=" text-[#000] text-[9px] font-bold text-center">
+                    Set Date
+                  </span>
+                </div>
+              </div>
+            );
+          });
+        })}
+        {/* <div className="flex mt-[160px]">
           <span className=" flex items-center justify-center text-gray-300">
             No Data
           </span>
-        </div>
-        <div className="flex items-center justify-center fixed bottom-[97px] right-[24px] w-[54px] h-[54px] rounded-full bg-slate-100">
+        </div> */}
+        <div className="flex items-center justify-center fixed bottom-[97px] md:right-[24px] right-[5px] w-[54px] h-[54px] rounded-full bg-slate-100">
           <Link href="/new-client">
             <Button>
               <span className="text-black">
@@ -64,7 +119,7 @@ const Home = () => {
             </Button>
           </Link>
         </div>
-        <div className="flex bottom-0 fixed items-center justify-center h-[78px] bg-[#F8F8F8] w-[100%] ">
+        <div className="flex fixed bottom-0  items-center justify-center h-[78px] bg-[#F8F8F8] w-[100%] ">
           <div className="flex ml-[48px] items-center h-[44px] my-[17px] border-r-2  ">
             <span className="text-[16px] mr-[22px]">Pending</span>
           </div>

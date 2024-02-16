@@ -7,7 +7,8 @@ import {
   signInWithPhoneNumber,
   onAuthStateChanged,
 } from "firebase/auth";
-import { auth } from "../../firebase.config";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, firestore } from "../../firebase.config";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 
@@ -43,8 +44,6 @@ const Login = () => {
     setOtp(value.slice(0, 6));
   };
 
-  // let recaptchaVerifier: any;
-
   function onCaptchVerify() {
     if (!(window as any).recaptchaVerifier) {
       (window as any).recaptchaVerifier = new RecaptchaVerifier(
@@ -77,7 +76,6 @@ const Login = () => {
         console.log("OTP Sent Successfully");
       })
       .catch((error) => {
-        alert(error.message);
         console.error("Error sending OTP:", error.message);
         setLoading(false);
       });
@@ -90,6 +88,14 @@ const Login = () => {
       .then(async (res: any) => {
         setLoading(false);
         console.log("Response:", res);
+        const usersCollection = doc(firestore, "users", res.user.uid);
+        const userDocSnapshot = await getDoc(usersCollection);
+        const userExists = userDocSnapshot.exists();
+        if (!userExists) {
+          await setDoc(usersCollection, {
+            phoneNumber: "+92" + ph,
+          });
+        }
         router.push("/home");
         alert("OTP verification successful!");
       })
@@ -132,8 +138,8 @@ const Login = () => {
                 variant="standard"
                 label="OTP"
                 inputProps={{
-                  inputMode: "numeric", // Show numeric keyboard on mobile devices
-                  pattern: "[0-9]*", // Allow only numeric input
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
                   maxLength: 6,
                 }}
                 value={otp}
@@ -143,7 +149,6 @@ const Login = () => {
               <Button
                 onClick={onOTPVerify}
                 size="small"
-                // variant="contained"
                 className="w-full !bg-black !hover:bg-black !mt-[10px] !text-white"
               >
                 Verify OTP

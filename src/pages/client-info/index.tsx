@@ -1,19 +1,17 @@
 import React from "react";
-import {
-  Button,
-  Skeleton,
-  TextField,
-  InputAdornment,
-  Avatar,
-} from "@mui/material";
+import { Button, Avatar } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PhoneIcon from "@mui/icons-material/Phone";
 import Link from "next/link";
 import MeasurmentTable from "@/components/MeasurmentTable";
+import { useRouter } from "next/router";
 
 const ClientInfo = () => {
+  const router = useRouter();
+  const clientData = router.query;
+  console.log("Client =>", clientData);
   return (
     <>
       <div className=" flex flex-col justify-center mb-[10px]">
@@ -42,9 +40,11 @@ const ClientInfo = () => {
                 HK
               </Avatar>
               <span className="text-[15px] font-bold text-[#000000] mt-[7px] ">
-                Hassan
+                {clientData.clientName}
               </span>
-              <span className="text-[12px] text-[#5E8EDA]">0900-1782683</span>
+              <span className="text-[12px] text-[#5E8EDA]">
+                {clientData.clientNumber}
+              </span>
             </div>
             <div className="text-center mt-[87px] ml-[27px]">
               <Avatar sx={{ bgcolor: "#939393", width: 42, height: 42 }}>
@@ -64,23 +64,23 @@ const ClientInfo = () => {
         <div className="flex flex-col items-center mt-[209px]">
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
             <span className="text-[11px] text-[#000] ml-[15px]">
-              Client Address
+              {clientData.clientAddress}
             </span>
           </div>
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
             <span className="text-[11px] text-[#000] ml-[15px]">
               Delivery Date
             </span>
-            <span className="text-[10px] ml-[170px] text-[#5E8EDA]">
-              Set Date
+            <span className="text-[10px] ml-[160px] text-[#5E8EDA]">
+              {clientData.deliveryDate}
             </span>
           </div>
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
             <span className="text-[11px] text-[#000] ml-[15px]">
               Remind Date
             </span>
-            <span className="text-[10px] ml-[170px] text-[#5E8EDA]">
-              Set Date
+            <span className="text-[10px] ml-[160px] text-[#5E8EDA]">
+              {clientData.remindDate}
             </span>
           </div>
         </div>
@@ -94,15 +94,15 @@ const ClientInfo = () => {
                 Total Amount
               </span>
               <span className="text-[10px] text-center text-[#939393]">
-                0.0
+                {clientData.totalAmount} PKR
               </span>
             </div>
             <div className="flex flex-col justify-center items-center w-[100px] h-[15px] mt-[20px] ml-[15px]">
               <span className="text-[10px] text-center text-[#000]">
-                Advance Payment{" "}
+                Advance Payment
               </span>
               <span className="text-[10px] text-center text-[#939393]">
-                0.0
+                {clientData.advancePayment} PKR
               </span>
             </div>
             <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[15px]">
@@ -110,7 +110,7 @@ const ClientInfo = () => {
                 Due Amount
               </span>
               <span className="text-[10px] text-center text-[#FF0000]">
-                0.0
+                {clientData.dueAmount} PKR
               </span>
             </div>
           </div>

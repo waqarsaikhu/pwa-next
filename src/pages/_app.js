@@ -1,5 +1,7 @@
 import React from "react";
 import Head from "next/head";
+import { Provider } from "react-redux";
+import store from "../store";
 import { Roboto } from "next/font/google";
 import { createTheme, ThemeProvider } from "@mui/material";
 import "../styles/tailwind.css";
@@ -18,19 +20,18 @@ const theme = createTheme({
 
 function MyApp({ Component, pageProps }) {
   return (
-    <ThemeProvider theme={theme}>
-      <Head>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-      </Head>
-      <style jsx global>{`
-        body {
-          margin: 0;
-        }
-      `}</style>
-      <main className={roboto.className}>
-        <Component {...pageProps} />
-      </main>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <style jsx global>{`
+          body {
+            margin: 0;
+          }
+        `}</style>
+        <main className={roboto.className}>
+          <Component {...pageProps} />
+        </main>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

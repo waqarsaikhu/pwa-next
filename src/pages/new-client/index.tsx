@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 
-import { doc, setDoc, collection } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, firestore, storage } from "../../firebase.config";
+import { auth } from "../../firebase.config";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 
 import { TextField, InputAdornment, MenuItem, Button } from "@mui/material";
-import { useAppDispatch } from "@/hooks";
 
 const NewClient = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
   const [imageError, setImageError] = useState("");
   const [formData, setFormData] = useState({
     clientName: "",

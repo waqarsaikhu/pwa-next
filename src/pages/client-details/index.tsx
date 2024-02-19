@@ -61,15 +61,7 @@ const Item: React.FC<ItemProps> = ({ name }) => {
     </div>
   );
 };
-const items = [
-  "Shirt",
-  "Pants",
-  "Coat",
-  "Trouser",
-  "WaistCoat",
-  "Shalwar",
-  "Kameez",
-];
+const items = ["Shirt", "Pants", "Coat", "Trouser"];
 
 const ClientDetails = () => {
   const [deliveryDate, setDeliveryDate] = useState("");

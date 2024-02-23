@@ -1,14 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, getDocs, doc } from "firebase/firestore";
-import { db,  auth} from "../firebase.config";
+import { db, auth } from "../firebase.config";
 import { RootState } from "../store"; // Assuming you have a store setup
 
-
+interface Client {
+  id: string;
+  advancePayment: string;
+  clientAddress: string;
+  clientGender: string;
+  clientImage: string;
+  clientName: string;
+  clientNumber: string;
+  clothImage: string;
+  deliveryDate: string;
+  dueAmount: string;
+  remindDate: string;
+  totalAmount: string;
+  // Add other properties as needed
+  measurements: any[]; // Define type for the 'measurements' property
+}
 interface User {
   id: string; // Assuming each user has an ID
   number: string; // Example property, update as needed
   // Add other properties as needed
-  clients: any[]; // Define type for the 'clients' property
+  clients: Client[]; // Define type for the 'clients' property
 }
 interface UserState {
   loading: boolean;
@@ -21,30 +36,7 @@ const initialState: UserState = {
   users: [],
   error: "",
 };
-const userId =  auth.currentUser?.uid || "";
-
-// export const fetchUser = createAsyncThunk("user/fetchUser", async () => {
-//   try {
-//     const userDocRef = doc(db, "users", userId);
-//     const userDocSnapshot = await getDoc(userDocRef);
-
-//     if (userDocSnapshot.exists()) {
-//       const userData = userDocSnapshot.data();
-//       const clientsCollectionRef = collection(userDocRef, "clients");
-//       const clientsSnapshot = await getDocs(clientsCollectionRef);
-//       const clientsData = clientsSnapshot.docs.map((doc) => doc.data());
-//       userData.clients = clientsData;
-//       return userData;
-//     } else {
-//       return null;
-//     }
-//   } catch (error) {
-//     throw error;
-//   }
-// });
-
-// export const selectUser = (state: UserState) => state.user;
-
+const userId = auth.currentUser?.uid || "";
 
 export const fetchUsers = createAsyncThunk<User[]>(
   "user/fetchUsers",
@@ -57,12 +49,43 @@ export const fetchUsers = createAsyncThunk<User[]>(
       for (const userDoc of usersSnapshot.docs) {
         const clientCollectionRef = collection(userDoc.ref, "clients");
         const clientSnapshot = await getDocs(clientCollectionRef);
-        const clientsData = clientSnapshot.docs.map((doc) => doc.data());
+
+        const clientsData: Client[] = [];
+        for (const clientDoc of clientSnapshot.docs) {
+          const measurementsCollectionRef = collection(
+            clientDoc.ref,
+            "measurements"
+          );
+          const measurementsSnapshot = await getDocs(measurementsCollectionRef);
+          const measurementsData = measurementsSnapshot.docs.map((doc) =>
+            doc.data()
+          );
+
+          // Create a new client object with the measurements data
+          const clientData: Client = {
+            id: clientDoc.id,
+            advancePayment: clientDoc.data().advancePayment,
+            clientAddress: clientDoc.data().clientAddress,
+            clientGender: clientDoc.data().clientGender,
+            clientImage: clientDoc.data().clientImage,
+            clientName: clientDoc.data().clientName,
+            clientNumber: clientDoc.data().clientNumber,
+            clothImage: clientDoc.data().clothImage,
+            deliveryDate: clientDoc.data().deliveryDate,
+            dueAmount: clientDoc.data().dueAmount,
+            remindDate: clientDoc.data().remindDate,
+            totalAmount: clientDoc.data().totalAmount,
+            // Add other properties as needed
+            measurements: measurementsData,
+          };
+
+          clientsData.push(clientData);
+        }
 
         // Create a new user object with the clients data
         const userData: User = {
           id: userDoc.id,
-          number: userDoc.data().phoneNumber, // Assuming 'name' is a property of the user document
+          number: userDoc.data().phoneNumber, // Assuming 'phoneNumber' is a property of the user document
           // Add other properties as needed
           clients: clientsData,
         };

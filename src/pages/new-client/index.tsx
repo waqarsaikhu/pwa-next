@@ -6,7 +6,6 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../../firebase.config";
 import Link from "next/link";
-import { useDispatch } from "react-redux";
 import { useRouter } from "next/router";
 
 import { TextField, InputAdornment, MenuItem, Button } from "@mui/material";
@@ -24,7 +23,6 @@ const NewClient = () => {
   });
   const handleInputChange = (e: any) => {
     const { name, value, files } = e.target;
-    console.log("File input changed:", files);
     setFormData((prevData: any) => ({
       ...prevData,
       [name]:

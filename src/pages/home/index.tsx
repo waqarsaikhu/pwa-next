@@ -9,14 +9,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAppDispatch } from "@/hooks";
 import { fetchUsers } from "@/redux/userSlice";
-import { collection, getDoc, doc } from "firebase/firestore";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
-import { auth, firestore, db } from "../../firebase.config";
-
-type ClientDetails = any;
+import { auth } from "../../firebase.config";
 
 const Home = () => {
   const user = useSelector((state: RootState) => state.user.users);
@@ -66,16 +63,18 @@ const Home = () => {
         </div>
 
         {user.map((item: any) => {
-          return item.clients.map((client: any) => {
+          return item.clients.map((client: any, index: number) => {
+            console.log("Info => ", client);
             return (
               <div
+                key={index}
                 className="flex flex-grow relative items-center w-[334px] bg-[#f8f8f8] mt-[10px] p-3 rounded-[19px] "
                 style={{
                   overflowY: "auto",
                 }}
               >
                 <div className="bg-gray-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-4">
-                  H
+                  {client.clientName[0]}
                 </div>
                 <div className="flex flex-col">
                   <span

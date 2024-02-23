@@ -1,62 +1,76 @@
 import React, { useState } from "react";
-import { Button, Skeleton, TextField, InputAdornment } from "@mui/material";
+import { Button } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import Link from "next/link";
 import MeasurmentTable from "@/components/MeasurmentTable";
 import Modal from "../../components/MeasurementForm";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { auth, firestore } from "../../firebase.config";
-import { collection, setDoc, doc } from "firebase/firestore";
+import { collection, doc, addDoc } from "firebase/firestore";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 interface ItemProps {
   name: string;
+  onMeasurementSubmit: (
+    measurements: Record<string, number>,
+    itemName: string
+  ) => void;
 }
-const measurementMap = {
+
+const measurementMap: { [key: string]: string[] } = {
   Shirt: ["Collar", "Sleeve", "Chest", "Length", "Teera"],
   Pants: ["Length", "Waist", "Hip", "Arouund Leg", "Around Knee", "Mori"],
   Coat: ["Collar", "Sleeve", "Chest", "Length", "Teera"],
   Trouser: ["Length", "Waist", "Hip", "Around Leg", "Around Knee", "Mori"],
 };
-const Item: React.FC<ItemProps> = ({ name }) => {
+const Item: React.FC<ItemProps> = ({ name, onMeasurementSubmit }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [itemName, setItemName] = useState(name);
   //@ts-ignore
   const measurements = measurementMap[name];
 
-  const openModal = () => {
+  const openModal = (itemName: string) => {
     setIsModalOpen(true);
+    setItemName(itemName);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
-  const handleMeasurementSubmit = (event: any) => {
-    event.preventDefault();
-
-    closeModal();
+  const handleMeasurementSubmit = async (
+    measurements: Record<string, number>,
+    itemName: string,
+    submitCallback: (
+      measurements: Record<string, number>,
+      itemName: string
+    ) => void
+  ) => {
+    console.log("Measurement Data:", measurements);
+    submitCallback(measurements, itemName);
   };
 
   return (
     <div className="flex flex-col justify-center items-center ml-[18px] mt-[35px] mb-[19px]">
       <span className="text-[10px] text-[#5E8EDA] text-center">Set Price</span>
       <button
-        onClick={openModal}
+        onClick={() => openModal(name)}
         className="w-16 h-16 bg-gray-300 rounded-full"
       ></button>
       <span className="text-[12px] text-[#595959]">{name}</span>
 
       {/* Modal */}
-
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        // @ts-ignore
         measurements={measurements}
-        onMeasurementSubmit={handleMeasurementSubmit}
+        itemName={itemName}
+        onMeasurementSubmit={(measurements) =>
+          handleMeasurementSubmit(measurements, name, onMeasurementSubmit)
+        }
       />
     </div>
   );
@@ -64,23 +78,35 @@ const Item: React.FC<ItemProps> = ({ name }) => {
 const items = ["Shirt", "Pants", "Coat", "Trouser"];
 
 const ClientDetails = () => {
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [remindDate, setRemindDate] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState<Date | null>(null);
+  const [remindDate, setRemindDate] = useState<Date | null>(null);
   const [totalAmount, setTotalAmount] = useState("");
   const [advancePayment, setAdvancePayment] = useState("");
   const [dueAmount, setDueAmount] = useState("");
+  const [selectedItem, setSelectedItem] = useState("");
 
-  const handleDeliveryDate = () => {
-    const selectedDate = prompt("Enter delivery date (YYYY-MM-DD):");
-    if (selectedDate) {
-      setDeliveryDate(selectedDate);
-    }
+  const [savedMeasurements, setSavedMeasurements] = useState<
+    Record<string, number>
+  >({});
+
+  const handleMeasurementSubmit = (
+    measurements: Record<string, number>,
+    itemName: string
+  ) => {
+    console.log("Item Name:", itemName);
+    setSavedMeasurements((prevState: any) => ({
+      ...prevState,
+      [itemName]: measurements,
+    }));
+    setSelectedItem(itemName);
+    console.log("Received measurements data:", measurements);
   };
-  const handleRemindDate = () => {
-    const selectedDate = prompt("Enter Remind date (YYYY-MM-DD):");
-    if (selectedDate) {
-      setRemindDate(selectedDate);
-    }
+
+  const handleDeliveryDate = (date: Date | null) => {
+    setDeliveryDate(date);
+  };
+  const handleRemindDate = (date: Date | null) => {
+    setRemindDate(date);
   };
   const handleTotalAmount = () => {
     const totalAmount = prompt("Total Amount:");
@@ -101,7 +127,6 @@ const ClientDetails = () => {
 
   const router = useRouter();
   const clientData = router.query;
-  console.log("Client =>", clientData.clientImage);
   const [startIndex, setStartIndex] = useState(0); // Start from the first item
 
   const handleNext = () => {
@@ -118,22 +143,49 @@ const ClientDetails = () => {
     const userDocRef = doc(firestore, "users", userId);
     const clientsCollectionRef = collection(userDocRef, "clients");
 
-    await setDoc(doc(clientsCollectionRef), {
+    // Format dates
+    const formatDate = (date: any) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+    const deliveryDateString = deliveryDate ? formatDate(deliveryDate) : null;
+    const remindDateString = remindDate ? formatDate(remindDate) : null;
+
+    // Save client data
+    const clientInfo = {
       clientName: clientData.clientName,
       clientNumber: clientData.clientNumber,
       clientAddress: clientData.clientAddress,
       clientGender: clientData.clientGender,
-      deliveryDate: deliveryDate,
-      remindDate: remindDate,
+      deliveryDate: deliveryDateString,
+      remindDate: remindDateString,
       totalAmount: totalAmount,
       advancePayment: advancePayment,
       dueAmount: dueAmount,
       clientImage: clientData.clientImage || null,
       clothImage: clientData.clothImage || null,
-    });
+    };
+
+    const clientDocRef = await addDoc(clientsCollectionRef, clientInfo);
     console.log("Client saved successfully.........");
+
+    // Iterate over saved measurements and save them to Firebase
+    Object.entries(savedMeasurements).forEach(async ([measurements]) => {
+      const measurementsCollectionRef = collection(
+        clientDocRef,
+        "measurements"
+      );
+      const measurementsData = {
+        measurements: measurements,
+      };
+      await addDoc(measurementsCollectionRef, measurementsData);
+    });
+
     router.push("/home");
   };
+
   return (
     <>
       <div className="flex flex-col justify-center items-center bg-[#FFF] mb-[10px]">
@@ -198,23 +250,25 @@ const ClientDetails = () => {
             <span className="text-[11px] text-[#000] ml-[15px]">
               Delivery Date
             </span>
-            <span
-              className="text-[10px] ml-[160px] text-[#5E8EDA] cursor-pointer"
-              onClick={handleDeliveryDate}
-            >
-              {deliveryDate || "Set Date"}
-            </span>
+            <DatePicker
+              selected={deliveryDate}
+              onChange={handleDeliveryDate}
+              dateFormat="yyyy-MM-dd"
+              className="text-[10px] ml-[150px] items-center w-[50px] text-[#5E8EDA] cursor-pointer"
+              placeholderText="Set Date"
+            />
           </div>
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
             <span className="text-[11px] text-[#000] ml-[15px]">
               Remind Date
             </span>
-            <span
-              className="text-[10px] ml-[160px] text-[#5E8EDA] cursor-pointer"
-              onClick={handleRemindDate}
-            >
-              {remindDate || "Set Date"}
-            </span>
+            <DatePicker
+              selected={remindDate}
+              onChange={handleRemindDate}
+              dateFormat="yyyy-MM-dd"
+              className="text-[10px] ml-[150px] items-center w-[50px] text-[#5E8EDA] cursor-pointer"
+              placeholderText="Set Date"
+            />
           </div>
         </div>
 
@@ -248,10 +302,7 @@ const ClientDetails = () => {
             <span className="text-[10px] text-center text-[#FF0000]">
               Due Amount
             </span>
-            <span
-              className="text-[10px] text-center text-[#FF0000] cursor-pointer"
-              // onClick={handleDueAmount}
-            >
+            <span className="text-[10px] text-center text-[#FF0000] cursor-pointer">
               {dueAmount || "0.0"}
             </span>
           </div>
@@ -266,7 +317,11 @@ const ClientDetails = () => {
             </button>
           )}
           {items.slice(startIndex, startIndex + 3).map((item) => (
-            <Item key={item} name={item} />
+            <Item
+              key={item}
+              name={item}
+              onMeasurementSubmit={handleMeasurementSubmit}
+            />
           ))}
           {startIndex < items.length - 3 && (
             <button

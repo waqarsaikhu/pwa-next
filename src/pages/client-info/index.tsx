@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, ReactNode } from "react";
 import { Button, Avatar } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -7,11 +7,23 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import Link from "next/link";
 import MeasurmentTable from "@/components/MeasurmentTable";
 import { useRouter } from "next/router";
+import { fetchUsers } from "@/redux/userSlice";
+import { useAppDispatch } from "@/hooks";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const ClientInfo = () => {
+  const user = useSelector((state: RootState) => state.user.users);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
   const router = useRouter();
   const clientData = router.query;
-  console.log("Client =>", clientData);
+  const clientId = clientData.id;
+  const allClients = user.flatMap((item: any) => item.clients);
+  const clientInfo = allClients.find((client: any) => client.id === clientId);
+  const clientMeasurments = clientInfo.measurements;
   return (
     <>
       <div className=" flex flex-col justify-center mb-[10px]">
@@ -37,13 +49,18 @@ const ClientInfo = () => {
             </div>
             <div className="mt-[63px] flex flex-col text-center">
               <Avatar sx={{ bgcolor: "#6C6C6C", width: 87, height: 87 }}>
-                HK
+                {typeof clientInfo.clientName === "string"
+                  ? clientInfo.clientName
+                      .split(" ")
+                      .map((name: any) => name[0])
+                      .join("")
+                  : ""}
               </Avatar>
               <span className="text-[15px] font-bold text-[#000000] mt-[7px] ">
-                {clientData.clientName}
+                {clientInfo.clientName}
               </span>
               <span className="text-[12px] text-[#5E8EDA]">
-                {clientData.clientNumber}
+                {clientInfo.clientNumber}
               </span>
             </div>
             <div className="text-center mt-[87px] ml-[27px]">
@@ -64,7 +81,7 @@ const ClientInfo = () => {
         <div className="flex flex-col items-center mt-[209px]">
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
             <span className="text-[11px] text-[#000] ml-[15px]">
-              {clientData.clientAddress}
+              {clientInfo.clientAddress}
             </span>
           </div>
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
@@ -72,7 +89,7 @@ const ClientInfo = () => {
               Delivery Date
             </span>
             <span className="text-[10px] ml-[160px] text-[#5E8EDA]">
-              {clientData.deliveryDate}
+              {clientInfo.deliveryDate}
             </span>
           </div>
           <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
@@ -80,7 +97,7 @@ const ClientInfo = () => {
               Remind Date
             </span>
             <span className="text-[10px] ml-[160px] text-[#5E8EDA]">
-              {clientData.remindDate}
+              {clientInfo.remindDate}
             </span>
           </div>
         </div>
@@ -94,7 +111,7 @@ const ClientInfo = () => {
                 Total Amount
               </span>
               <span className="text-[10px] text-center text-[#939393]">
-                {clientData.totalAmount} PKR
+                {clientInfo.totalAmount} PKR
               </span>
             </div>
             <div className="flex flex-col justify-center items-center w-[100px] h-[15px] mt-[20px] ml-[15px]">
@@ -102,7 +119,7 @@ const ClientInfo = () => {
                 Advance Payment
               </span>
               <span className="text-[10px] text-center text-[#939393]">
-                {clientData.advancePayment} PKR
+                {clientInfo.advancePayment} PKR
               </span>
             </div>
             <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[15px]">
@@ -110,7 +127,7 @@ const ClientInfo = () => {
                 Due Amount
               </span>
               <span className="text-[10px] text-center text-[#FF0000]">
-                {clientData.dueAmount} PKR
+                {clientInfo.dueAmount} PKR
               </span>
             </div>
           </div>
@@ -119,7 +136,28 @@ const ClientInfo = () => {
           <span className="text-[11px] mt-[16px] text-[#000]">
             Measurements
           </span>
-          <MeasurmentTable />
+          {clientMeasurments.map((item: any, index: number) => (
+            <div
+              key={index}
+              className="mb-4 p-3 w-[300px] shadow-lg rounded-md bg-white"
+            >
+              <h3 className="text-xl flex justify-center font-semibold text-blue-600">
+                {item.itemName}
+              </h3>
+              {Object.entries(item.measurements).map(([key, value]) => (
+                <div key={key} className="flex flex-row mt-2 text-gray-700">
+                  <div className="w-">
+                    <span className="font-medium">{key}:</span>
+                  </div>
+                  <div className="w-1/2">
+                    <span className="flex justify-center items-center ">
+                      {value as React.ReactNode}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
         <div className="flex items-center justify-center">
           <div className="w-[311px] h-[58px] rounded-[19px] mt-[7px] bg-[#F8F8F8]">

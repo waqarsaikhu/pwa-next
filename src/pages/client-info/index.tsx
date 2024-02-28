@@ -54,9 +54,9 @@ const ClientInfo = () => {
                     {clientInfo
                       ? typeof clientInfo.clientName === "string"
                         ? clientInfo.clientName
-                            .split(" ")
-                            .map((name: any) => name[0])
-                            .join("")
+                          .split(" ")
+                          .map((name: any) => name[0])
+                          .join("")
                         : ""
                       : ""}
                   </Avatar>
@@ -154,7 +154,7 @@ const ClientInfo = () => {
                         <tbody>
                           {Object.entries(item.measurements).map(
                             ([key, value]) => (
-                              <tr key={key}>
+                              <tr key={key} className="border-b border-gray-300">
                                 <td className="font-medium">{key}:</td>
                                 <td className="flex justify-center items-center">
                                   {value as React.ReactNode}

@@ -19,10 +19,25 @@ const Home = () => {
   const user = useSelector((state: RootState) => state.user.users);
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
+  const handleSearchInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredClients = user
+    ? user.reduce((acc: any, user) => {
+      const filtered = user.clients.filter((client) =>
+        client.clientName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      return [...acc, ...filtered];
+    }, [])
+    : [];
 
   const signOutAndNavigate = async () => {
     try {
@@ -35,84 +50,100 @@ const Home = () => {
   return (
     <>
       <div className="flex flex-col justify-center items-center bg-[#FFF] mb-[10px]">
-        <div className="flex justify-center mt-[28px] w-[100%] h-[40px] border-b-[1px]">
+        <div className="flex justify-between mt-[28px] w-[100%] h-[40px] border-b-[1px]">
           <span
-            className="ml-[28px] w-[14px] h-[14px]"
+            className="md:ml-[28px] ml-[15px] w-[14px] h-[14px]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <MenuIcon />
           </span>
           <span className="ml-[79px] text-[18px] font-bold">TAILOR BOOK</span>
-          <span className="ml-[79px] w-[14px] h-[14px] mr-[29px]">
+          <span className="ml-[79px] w-[14px] h-[14px] md:mr-[29px] mr-[15px]">
             <NotificationsNoneOutlinedIcon />
           </span>
         </div>
-        <div className="flex h-[20px] mt-[10px]">
-          <div className="relative ml-[25px]">
+        <div className="flex h-[30px] mt-[10px]">
+          <div className="relative ">
             <input
-              className="rounded-[5px]  border w-[250px] h-full p-2"
+              className="rounded-[5px] border md:w-[300px] w-[350px] h-full p-2"
               placeholder="Search"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
             />
             <div className="absolute inset-y-0 right-1 m-1 mt-2 flex items-center pointer-events-none text-gray-300">
               <SearchIcon fontSize="small" />
             </div>
           </div>
-          <span className="ml-[10px] text-sm">
+          <span className=" mt-[5px] text-sm">
             <FilterListIcon fontSize="small" />
           </span>
         </div>
-        {user ? (
-          <>
-            {user.map((item: any) => {
-              return item.clients.map((client: any, index: number) => {
-                console.log("Info => ", user);
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-grow relative items-center w-[334px] bg-[#f8f8f8] mt-[10px] p-3 rounded-[19px] "
-                    style={{
-                      overflowY: "auto",
+        {filteredClients.length > 0 ? (
+          filteredClients.map((client: any, index: number) => (
+            <div
+              key={index}
+              className="flex flex-grow relative items-center md:w-[334px] w-[95%] bg-[#f8f8f8] mt-[10px] p-3 rounded-[19px] cursor-pointer "
+              style={{
+                overflowY: "auto",
+              }}
+              onClick={() => {
+                router.push({
+                  pathname: "/client-info",
+                  query: client,
+                });
+              }}
+            >
+              <div className="bg-gray-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-4">
+                {client.clientName[0]}
+              </div>
+              <div className="flex flex-col">
+                <span
+                  className="font-bold text-[12px] cursor-pointer "
+                  onClick={() => {
+                    router.push({
+                      pathname: "/client-info",
+                      query: client,
+                    });
+                  }}
+                >
+                  {client.clientName}
+                </span>
+                <span
+                  className="text-[#939393] text-[10px]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("Set delivery date now");
+                  }}
+                >
+                  Set delivery date now
+                </span>
+              </div>
+              <div className=" absolute right-[15px] text-center">
+                <div className="w-[68px] flex justify-center items-center h-[18px] text-[9px] bg-[#939393] rounded-[7px] text-white  text-center">
+                  <button
+                    className=""
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("Order Completed");
                     }}
                   >
-                    <div className="bg-gray-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-4">
-                      {client.clientName[0]}
-                    </div>
-                    <div className="flex flex-col">
-                      <span
-                        className="font-bold text-[12px] cursor-pointer "
-                        onClick={() => {
-                          router.push({
-                            pathname: "/client-info",
-                            query: client,
-                          });
-                        }}
-                      >
-                        {client.clientName}
-                      </span>
-                      <span className="text-[#939393] text-[10px]">
-                        Set delivery date now
-                      </span>
-                    </div>
-                    <div className=" absolute right-[15px] text-center">
-                      <div className="w-[68px] flex justify-center items-center h-[18px] text-[9px] bg-[#939393] rounded-[7px] text-white  text-center">
-                        <button className="">Complete</button>
-                      </div>
-                      <span className=" text-[#000] text-[9px] font-bold text-center">
-                        Set Date
-                      </span>
-                    </div>
-                  </div>
-                );
-              });
-            })}
-          </>
+                    Complete
+                  </button>
+                </div>
+                <span className=" text-[#000] text-[9px] font-bold text-center">
+                  {client.deliveryDate}{" "}
+                </span>
+              </div>
+            </div>
+          ))
         ) : (
-          // <div className="flex">
-          <div className="animate-spin rounded-full border-t-4 border-gray-500 border-solid h-24 w-24"></div>
-          // </div>
+          <div className="h-screen flex justify-center items-center">
+            <div className="text-center mb-[300px]">
+              <span className="text-lg text-gray-300">No Data</span>
+            </div>
+          </div>
         )}
-
-        <div className="flex items-center justify-center fixed bottom-[97px] md:right-[24px] right-[5px] w-[54px] h-[54px] rounded-full bg-slate-100">
+        <div className="flex items-center justify-center fixed bottom-[97px] md:right-[24px] right-[8px] w-[54px] h-[54px] rounded-full bg-slate-100">
           <Link href="/new-client">
             <Button>
               <span className="text-black">
@@ -122,7 +153,7 @@ const Home = () => {
           </Link>
         </div>
         <div className="flex fixed bottom-0  items-center justify-center h-[78px] bg-[#F8F8F8] w-[100%] ">
-          <div className="flex ml-[48px] items-center h-[44px] my-[17px] border-r-2  ">
+          <div className="flex ml-[21px] items-center h-[44px] my-[17px] border-r-2  ">
             <span className="text-[16px] mr-[22px]">Pending</span>
           </div>
           <div className="flex ml-[21px] h-[44px] my-[17px] items-center border-r-2">

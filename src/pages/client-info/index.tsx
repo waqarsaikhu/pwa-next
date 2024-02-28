@@ -30,7 +30,7 @@ const ClientInfo = () => {
         <>
           <div className=" flex flex-col justify-center mb-[10px]">
             <div className="h-[114px] w-screen flex justify-center bg-[#F8F8F8] absolute top-0">
-              <div className=" absolute top-[27px] left-[25px]">
+              <div className=" absolute top-[27px] left-0">
                 <Link href="/home">
                   <Button>
                     <span className="text-black">
@@ -77,30 +77,30 @@ const ClientInfo = () => {
                 </div>
               </div>
               <div>
-                <span className="absolute right-[30px] top-[32px] flex">
+                <span className="absolute right-[5px] top-[32px] flex">
                   <MoreVertIcon />
                 </span>
               </div>
             </div>
             <div className="flex flex-col items-center mt-[209px]">
-              <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
+              <div className="md:w-[300px] w-[95%] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
                 <span className="text-[11px] text-[#000] ml-[15px]">
                   {clientInfo ? clientInfo.clientAddress : ""}
                 </span>
               </div>
-              <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
+              <div className="md:w-[300px] relative w-[95%] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
                 <span className="text-[11px] text-[#000] ml-[15px]">
                   Delivery Date
                 </span>
-                <span className="text-[10px] ml-[160px] text-[#5E8EDA]">
+                <span className="text-[10px] md:ml-[160px] absolute right-2 text-[#5E8EDA]">
                   {clientInfo ? clientInfo.deliveryDate : ""}
                 </span>
               </div>
-              <div className="w-[300px] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
+              <div className="md:w-[300px] relative w-[95%] h-[36px] rounded-[19px] bg-[#F8F8F8] mt-[18px] items-center flex">
                 <span className="text-[11px] text-[#000] ml-[15px]">
                   Remind Date
                 </span>
-                <span className="text-[10px] ml-[160px] text-[#5E8EDA]">
+                <span className="text-[10px] md:ml-[160px] absolute right-2 text-[#5E8EDA]">
                   {clientInfo ? clientInfo.remindDate : ""}
                 </span>
               </div>
@@ -109,7 +109,7 @@ const ClientInfo = () => {
               <span className="text-[11px] mt-[18px] text-[#000]">
                 Payment Status
               </span>
-              <div className="flex flex-row w-[311px] h-[52px] bg-[#F8F8F8] rounded-[19px]">
+              <div className="flex flex-row md:w-[311px] w-[95%] h-[52px] bg-[#F8F8F8] rounded-[19px]">
                 <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[15px]">
                   <span className="text-[10px] text-center text-[#000]">
                     Total Amount
@@ -118,7 +118,7 @@ const ClientInfo = () => {
                     {clientInfo ? clientInfo.totalAmount : ""} PKR
                   </span>
                 </div>
-                <div className="flex flex-col justify-center items-center w-[100px] h-[15px] mt-[20px] ml-[15px]">
+                <div className="flex flex-col justify-center items-center w-[100px] h-[15px] mt-[20px] ml-[50px]">
                   <span className="text-[10px] text-center text-[#000]">
                     Advance Payment
                   </span>
@@ -126,7 +126,7 @@ const ClientInfo = () => {
                     {clientInfo ? clientInfo.advancePayment : ""} PKR
                   </span>
                 </div>
-                <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[15px]">
+                <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[50px]">
                   <span className="text-[10px] text-center text-[#FF0000]">
                     Due Amount
                   </span>
@@ -148,7 +148,7 @@ const ClientInfo = () => {
                   <h3 className="text-xl flex justify-center font-semibold text-[#000]">
                     {item.itemName}
                   </h3>
-                  <div className="grid grid-cols-2 gap-1">
+                  <div className="grid grid-cols-1 gap-10">
                     <div className="flex flex-col mt-2 justify-center text-gray-700">
                       <table>
                         <tbody>

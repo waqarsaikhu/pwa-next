@@ -3,18 +3,15 @@ import Button from "@mui/material/Button";
 import Link from "next/link";
 import Skeleton from "@mui/material/Skeleton";
 import { useRouter } from "next/router";
-import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase.config";
 const StartPage = () => {
   const router = useRouter();
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.push("/home");
-      }
-    });
+    const user = auth.currentUser
 
-    return () => unsubscribe();
+    if (user) {
+      router.push("/home");
+    }
   }, [router]);
   return (
     <>
@@ -51,9 +48,11 @@ const StartPage = () => {
                 LOG IN
               </Button>
             </Link>
-            <Button className="!ml-[10px]" size="small" variant="outlined">
-              REGISTER
-            </Button>
+            <Link href="/register">
+              <Button className="!ml-[10px]" size="small" variant="outlined">
+                REGISTER
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

@@ -52,10 +52,9 @@ const Login = () => {
         {
           size: "invisible",
           callback: (response: any) => {
-            console.log("Response:", response);
             onSignUp();
           },
-          "expired-callback": () => {},
+          "expired-callback": () => { },
         }
       );
     }
@@ -65,7 +64,6 @@ const Login = () => {
     setLoading(true);
     onCaptchVerify();
     const appVerifier = (window as any).recaptchaVerifier;
-    console.log("C:", appVerifier);
     const formatPh = "+92" + ph;
     await signInWithPhoneNumber(auth, formatPh, appVerifier)
       .then((confirmationResult) => {
@@ -87,12 +85,12 @@ const Login = () => {
       .confirm(otp)
       .then(async (res: any) => {
         setLoading(false);
-        console.log("Response:", res);
         const usersCollection = doc(firestore, "users", res.user.uid);
         const userDocSnapshot = await getDoc(usersCollection);
         const userExists = userDocSnapshot.exists();
         if (!userExists) {
           await setDoc(usersCollection, {
+            id: res.user.uid,
             phoneNumber: "+92" + ph,
           });
         }

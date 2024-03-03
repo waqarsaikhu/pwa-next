@@ -166,18 +166,20 @@ const ClientDetails = () => {
       dueAmount: dueAmount,
       clientImage: clientData.clientImage || null,
       clothImage: clientData.clothImage || null,
+      completed: false,
     };
 
     const clientDocRef = await addDoc(clientsCollectionRef, clientInfo);
     console.log("Client saved successfully.........");
 
     // Iterate over saved measurements and save them to Firebase
-    Object.entries(savedMeasurements).forEach(async ([measurements]) => {
+    Object.entries(savedMeasurements).forEach(async ([itemName, measurements]) => {
       const measurementsCollectionRef = collection(
         clientDocRef,
         "measurements"
       );
       const measurementsData = {
+        itemName: itemName,
         measurements: measurements,
       };
       await addDoc(measurementsCollectionRef, measurementsData);

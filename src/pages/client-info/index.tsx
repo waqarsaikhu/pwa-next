@@ -23,7 +23,17 @@ const ClientInfo = () => {
   const allClients = user.flatMap((item: any) => item.clients);
   const clientInfo = allClients.find((client: any) => client.id === clientId);
   const clientMeasurements = clientInfo?.measurements || [];
+  const handlePhoneIconClick = () => {
+    if (clientInfo && clientInfo.clientNumber) {
+      window.location.href = `tel:${clientInfo.clientNumber}`;
+    }
+  };
 
+  const handleChatBubbleIconClick = () => {
+    if (clientInfo && clientInfo.clientNumber) {
+      window.location.href = `sms:${clientInfo.clientNumber}`;
+    }
+  };
   return (
     <>
       {clientInfo ? (
@@ -40,8 +50,8 @@ const ClientInfo = () => {
                   </Button>
                 </Link>
               </div>
-              <div className="flex flex-row">
-                <div className="text-center mt-[87px] mr-[27px]">
+              <div className="flex flex-row cursor-pointer">
+                <div className="text-center mt-[87px] mr-[27px]" onClick={handleChatBubbleIconClick}>
                   <Avatar sx={{ bgcolor: "#939393", width: 42, height: 42 }}>
                     <span>
                       <ChatBubbleIcon fontSize="small" />
@@ -67,7 +77,7 @@ const ClientInfo = () => {
                     {clientInfo ? clientInfo.clientNumber : ""}
                   </span>
                 </div>
-                <div className="text-center mt-[87px] ml-[27px]">
+                <div className="text-center mt-[87px] ml-[27px] cursor-pointer" onClick={handlePhoneIconClick}>
                   <Avatar sx={{ bgcolor: "#939393", width: 42, height: 42 }}>
                     <span>
                       <PhoneIcon fontSize="small" />
@@ -77,7 +87,7 @@ const ClientInfo = () => {
                 </div>
               </div>
               <div>
-                <span className="absolute right-[5px] top-[32px] flex">
+                <span className="absolute md:right-[20px] right-[5px] top-[32px] flex">
                   <MoreVertIcon />
                 </span>
               </div>
@@ -110,7 +120,7 @@ const ClientInfo = () => {
                 Payment Status
               </span>
               <div className="flex flex-row md:w-[311px] w-[95%] h-[52px] bg-[#F8F8F8] rounded-[19px]">
-                <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[15px]">
+                <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] md:ml-[10px] ml-[15px]">
                   <span className="text-[10px] text-center text-[#000]">
                     Total Amount
                   </span>
@@ -118,7 +128,7 @@ const ClientInfo = () => {
                     {clientInfo ? clientInfo.totalAmount : ""} PKR
                   </span>
                 </div>
-                <div className="flex flex-col justify-center items-center w-[100px] h-[15px] mt-[20px] ml-[50px]">
+                <div className="flex flex-col justify-center items-center w-[100px] h-[15px] mt-[20px] md:ml-[15px] ml-[50px]">
                   <span className="text-[10px] text-center text-[#000]">
                     Advance Payment
                   </span>
@@ -126,7 +136,7 @@ const ClientInfo = () => {
                     {clientInfo ? clientInfo.advancePayment : ""} PKR
                   </span>
                 </div>
-                <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] ml-[50px]">
+                <div className="flex flex-col justify-center items-center w-[80px] h-[15px] mt-[20px] md:ml-[15px] ml-[50px]">
                   <span className="text-[10px] text-center text-[#FF0000]">
                     Due Amount
                   </span>

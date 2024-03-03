@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, getDocs, doc } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db, auth } from "../firebase.config";
-import { RootState } from "../store"; // Assuming you have a store setup
 
+// Define interfaces for Client and User
 interface Client {
   id: string;
   advancePayment: string;
@@ -16,42 +16,52 @@ interface Client {
   dueAmount: string;
   remindDate: string;
   totalAmount: string;
-  // Add other properties as needed
+  completed: boolean;
   measurements: any[]; // Define type for the 'measurements' property
 }
+
 interface User {
+  [x: string]: any;
   id: string; // Assuming each user has an ID
   number: string; // Example property, update as needed
-  // Add other properties as needed
   clients: Client[]; // Define type for the 'clients' property
 }
+
+// Define interface for UserState
 interface UserState {
   loading: boolean;
   users: User[];
   error: string;
 }
 
+// Define initial state for UserState
 const initialState: UserState = {
   loading: false,
   users: [],
   error: "",
 };
-const userId = auth.currentUser?.uid || "";
 
-export const fetchUsers = createAsyncThunk<User[]>(
+// Fetch users and their associated clients and measurements from Firestore
+export const fetchUsers = createAsyncThunk<User[], void>(
   "user/fetchUsers",
   async () => {
     try {
-      const usersCollectionRef = collection(db, "users");
-      const usersSnapshot = await getDocs(usersCollectionRef);
+      const storedUid = localStorage.getItem("uid");
 
+      // Get users collection reference
+      const usersCollectionRef = collection(db, "users");
+      const usersSnapshot = await getDocs(
+        query(usersCollectionRef, where("id", "==", storedUid))
+      );
       const usersData: User[] = [];
       for (const userDoc of usersSnapshot.docs) {
+        // Get clients collection reference for each user
         const clientCollectionRef = collection(userDoc.ref, "clients");
         const clientSnapshot = await getDocs(clientCollectionRef);
 
         const clientsData: Client[] = [];
         for (const clientDoc of clientSnapshot.docs) {
+          // Get measurements collection reference for each client
           const measurementsCollectionRef = collection(
             clientDoc.ref,
             "measurements"
@@ -75,7 +85,7 @@ export const fetchUsers = createAsyncThunk<User[]>(
             dueAmount: clientDoc.data().dueAmount,
             remindDate: clientDoc.data().remindDate,
             totalAmount: clientDoc.data().totalAmount,
-            // Add other properties as needed
+            completed: clientDoc.data().completed,
             measurements: measurementsData,
           };
 
@@ -85,8 +95,7 @@ export const fetchUsers = createAsyncThunk<User[]>(
         // Create a new user object with the clients data
         const userData: User = {
           id: userDoc.id,
-          number: userDoc.data().phoneNumber, // Assuming 'phoneNumber' is a property of the user document
-          // Add other properties as needed
+          number: userDoc.data().phoneNumber,
           clients: clientsData,
         };
 
@@ -99,6 +108,7 @@ export const fetchUsers = createAsyncThunk<User[]>(
   }
 );
 
+// Create user slice
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -121,7 +131,5 @@ const userSlice = createSlice({
     });
   },
 });
-
-// export const selectUsers = (state: RootState) => state.user
 
 export default userSlice.reducer;

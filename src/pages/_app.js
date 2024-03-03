@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Head from "next/head";
 import { Provider } from "react-redux";
 import store from "../store";
 import { Roboto } from "next/font/google";
 import { createTheme, ThemeProvider } from "@mui/material";
+
 import "../styles/tailwind.css";
 const roboto = Roboto({
   weight: "400",
@@ -13,7 +14,7 @@ const roboto = Roboto({
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976D2", // Change this to your desired primary color
+      main: "#1976D2",
     },
   },
 });
